@@ -27,7 +27,7 @@ const templates: Record<
   },
   cajonera: {
     name: "Cajonera",
-    description: "Módulo con faldón superior e inferior",
+    description: "Módulo con faldones y cajones",
     icon: "CJ",
   },
 };
@@ -186,6 +186,70 @@ export default function Home() {
         edges: {},
         note: "Ancho − 9 · Profundidad − 9",
       },
+      {
+        reference: "CAJON NN",
+        length: width - 111,
+        width: 492,
+        quantity: 3,
+        material: sharedMaterial,
+        grain,
+        edges: {},
+        note: "Ancho − 111",
+      },
+      {
+        reference: "TRASERA CAJON NN",
+        length: width - 123,
+        width: 64,
+        quantity: 1,
+        material: sharedMaterial,
+        grain,
+        edges: { largo1: `${sharedMaterial} 0,45` },
+        note: "Ancho − 123",
+      },
+      {
+        reference: "TRASERA CAJON NN",
+        length: width - 123,
+        width: 160,
+        quantity: 2,
+        material: sharedMaterial,
+        grain,
+        edges: {
+          largo1: `${sharedMaterial} 0,45`,
+          ancho1: `${sharedMaterial} 0,45`,
+          ancho2: `${sharedMaterial} 0,45`,
+        },
+        note: "Ancho − 123",
+      },
+      {
+        reference: 'CAJON "NN"',
+        length: 169,
+        width: width - 5,
+        quantity: 1,
+        material: sharedMaterial,
+        grain,
+        edges: {
+          largo1: `${sharedMaterial} 2mm`,
+          largo2: `${sharedMaterial} 2mm`,
+          ancho1: `${sharedMaterial} 2mm`,
+          ancho2: `${sharedMaterial} 2mm`,
+        },
+        note: "169 · Ancho − 5",
+      },
+      {
+        reference: 'CAJON "NN"',
+        length: 268,
+        width: width - 5,
+        quantity: 2,
+        material: sharedMaterial,
+        grain,
+        edges: {
+          largo1: `${sharedMaterial} 2mm`,
+          largo2: `${sharedMaterial} 2mm`,
+          ancho1: `${sharedMaterial} 2mm`,
+          ancho2: `${sharedMaterial} 2mm`,
+        },
+        note: "268 · Ancho − 5",
+      },
     ];
   }, [depth, doors, furniture, grain, material, width]);
 
@@ -343,8 +407,8 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {parts.map((part) => (
-                  <tr key={part.reference}>
+                {parts.map((part, index) => (
+                  <tr key={`${part.reference}-${index}`}>
                     <td>
                       <strong>{part.reference}</strong>
                       {part.note && <small>{part.note}</small>}

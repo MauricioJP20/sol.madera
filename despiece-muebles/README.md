@@ -22,7 +22,8 @@ npm run lint
 ## Fórmulas incluidas
 
 - **Bajo mesada:** laterales, piso, faldones, estante, fondo y puertas.
-- **Cajonera:** laterales, piso, faldón superior, faldón inferior y fondo.
+- **Cajonera:** laterales, piso, faldón superior, faldón inferior, fondo,
+  cajones y traseras de cajón.
 - Las medidas se expresan en milímetros.
 - El fondo se calcula con material `FIBRO`.
 - Las puertas se dividen por la cantidad indicada y descuentan 5 mm.
