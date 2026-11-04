@@ -28,3 +28,8 @@ npm run lint
 - Las medidas se expresan en milímetros.
 - El fondo se calcula con material `FIBRO`.
 - Las puertas se dividen por la cantidad indicada y descuentan 5 mm.
+
+
+## link de bitacora
+
+https://docs.google.com/document/d/1256uY08l07OV7fSt3pDSfZ0Pk_1QUc4_/edit?usp=sharing&ouid=104321171438394785338&rtpof=true&sd=true
