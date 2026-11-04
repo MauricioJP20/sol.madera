@@ -43,6 +43,11 @@ function formatMillimeters(value: number) {
   return `${Math.max(0, Math.round(value))} mm`;
 }
 
+function escapeCsvValue(value: string | number) {
+  const text = String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
 export default function Home() {
   const [furniture, setFurniture] = useState<FurnitureType>("bajo-mesada");
   const [material, setMaterial] = useState("BLANCO");
@@ -255,6 +260,45 @@ export default function Home() {
 
   const totalPieces = parts.reduce((total, part) => total + part.quantity, 0);
 
+  function downloadCsv() {
+    const headers = [
+      "Referencia",
+      "Largo (mm)",
+      "Ancho (mm)",
+      "Cantidad",
+      "Material",
+      "Veta",
+      "Cantos",
+      "Observaciones",
+    ];
+    const rows = parts.map((part) => [
+      part.reference,
+      Math.max(0, Math.round(part.length)),
+      Math.max(0, Math.round(part.width)),
+      part.quantity,
+      part.material,
+      part.grain,
+      Object.entries(part.edges)
+        .map(([edge, value]) => `${edge}: ${value}`)
+        .join(" | "),
+      part.note ?? "",
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(";"))
+      .join("\r\n");
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `despiece-${furniture}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function printPdf() {
+    window.print();
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -391,6 +435,15 @@ export default function Home() {
               <span><b>{parts.length}</b> referencias</span>
               <span><b>{totalPieces}</b> piezas totales</span>
             </div>
+          </div>
+
+          <div className="export-actions" aria-label="Exportar despiece">
+            <button className="export-button secondary" onClick={downloadCsv} type="button">
+              Descargar CSV
+            </button>
+            <button className="export-button primary" onClick={printPdf} type="button">
+              Imprimir / PDF
+            </button>
           </div>
 
           <div className="table-wrap">

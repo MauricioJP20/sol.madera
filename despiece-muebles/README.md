@@ -27,3 +27,10 @@ npm run lint
 - Las medidas se expresan en milímetros.
 - El fondo se calcula con material `FIBRO`.
 - Las puertas se dividen por la cantidad indicada y descuentan 5 mm.
+
+## Exportación
+
+- **Descargar CSV** genera un archivo separado por punto y coma, compatible con Excel,
+  con las referencias, medidas, cantidades, materiales, vetas y cantos calculados.
+- **Imprimir / PDF** abre el diálogo de impresión del navegador para guardar el
+  despiece como PDF. En el diálogo, elegí la opción **Guardar como PDF**.
