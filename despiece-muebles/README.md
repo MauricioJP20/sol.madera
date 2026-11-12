@@ -34,3 +34,8 @@ npm run lint
   con las referencias, medidas, cantidades, materiales, vetas y cantos calculados.
 - **Imprimir / PDF** abre el diálogo de impresión del navegador para guardar el
   despiece como PDF. En el diálogo, elegí la opción **Guardar como PDF**.
+
+## Maquina de destino 
+
+- **el modelo de maquina es seccionadora horizaontal cnc marzica kdt quadra 320**
+
