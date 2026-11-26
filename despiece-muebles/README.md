@@ -30,12 +30,20 @@ npm run lint
 
 ## Exportación
 
-- **Descargar CSV** genera un archivo separado por punto y coma, compatible con Excel,
-  con las referencias, medidas, cantidades, materiales, vetas y cantos calculados.
+- **Descargar CSV** genera `opticut-<mueble>.csv` delimitado por punto y coma,
+  listo para importar en OptiCut. El archivo contiene estas 15 columnas, en este
+  orden: `Altura`, `Ancho`, `Cantidad`, `Material`, `Espesor`, `Referencia`,
+  `Dirección de la Fibra`, `Material de la Cinta superior`,
+  `Grosor de Cinta superior`, `Material de la Cinta inferior`,
+  `Espesor Cinta Inferior`, `Material de la Cinta izquierda`,
+  `Grosor de la Cinta izquierda`, `Material de la Cinta derecha` y
+  `Grosor de la Cinta derecha`.
+- Las cintas se exportan por borde con sus espesores en punto decimal (`0.45`
+  o `2`). El CSV usa codificación ANSI Windows-1252, no incluye BOM y termina
+  sus líneas con CRLF.
 - **Imprimir / PDF** abre el diálogo de impresión del navegador para guardar el
   despiece como PDF. En el diálogo, elegí la opción **Guardar como PDF**.
 
 ## Maquina de destino 
 
 - **el modelo de maquina es seccionadora horizaontal cnc marzica kdt quadra 320**
-

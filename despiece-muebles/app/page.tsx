@@ -3,16 +3,22 @@
 import { useMemo, useState } from "react";
 
 type FurnitureType = "bajo-mesada" | "cajonera";
-type Edge = "largo1" | "largo2" | "ancho1" | "ancho2";
+type EdgeThickness = "" | "0.45" | "2";
 
-type Part = {
+type PartEdges = {
+  cantoSup: EdgeThickness;
+  cantoInf: EdgeThickness;
+  cantoIzq: EdgeThickness;
+  cantoDer: EdgeThickness;
+};
+
+type Part = PartEdges & {
   reference: string;
   length: number;
   width: number;
   quantity: number;
   material: string;
   grain: string;
-  edges: Partial<Record<Edge, string>>;
   note?: string;
 };
 
@@ -32,12 +38,28 @@ const templates: Record<
   },
 };
 
-const edgeLabels: { key: Edge; label: string }[] = [
-  { key: "largo1", label: "Largo 1" },
-  { key: "largo2", label: "Largo 2" },
-  { key: "ancho1", label: "Ancho 1" },
-  { key: "ancho2", label: "Ancho 2" },
+const edgeLabels: {
+  key: keyof PartEdges;
+  label: string;
+  shortLabel: string;
+}[] = [
+  { key: "cantoSup", label: "Superior", shortLabel: "Sup" },
+  { key: "cantoInf", label: "Inferior", shortLabel: "Inf" },
+  { key: "cantoIzq", label: "Izquierda", shortLabel: "Izq" },
+  { key: "cantoDer", label: "Derecha", shortLabel: "Der" },
 ];
+
+function edgeSet(
+  thickness: Exclude<EdgeThickness, "">,
+  ...sides: (keyof PartEdges)[]
+): PartEdges {
+  return {
+    cantoSup: sides.includes("cantoSup") ? thickness : "",
+    cantoInf: sides.includes("cantoInf") ? thickness : "",
+    cantoIzq: sides.includes("cantoIzq") ? thickness : "",
+    cantoDer: sides.includes("cantoDer") ? thickness : "",
+  };
+}
 
 function formatMillimeters(value: number) {
   return `${Math.max(0, Math.round(value))} mm`;
@@ -55,14 +77,20 @@ export default function Home() {
   const [width, setWidth] = useState(600);
   const [depth, setDepth] = useState(560);
   const [doors, setDoors] = useState(1);
+  const dimensionsAreValid =
+    Number.isFinite(width) &&
+    width >= 250 &&
+    Number.isFinite(depth) &&
+    depth >= 200;
 
   const parts = useMemo<Part[]>(() => {
     const sharedMaterial = material.trim() || "BLANCO";
-    const commonEdges = {
-      largo1: `${sharedMaterial} 0,45`,
-      ancho1: `${sharedMaterial} 0,45`,
-      ancho2: `${sharedMaterial} 0,45`,
-    };
+    const commonEdges = edgeSet(
+      "0.45",
+      "cantoIzq",
+      "cantoSup",
+      "cantoInf",
+    );
 
     if (furniture === "bajo-mesada") {
       return [
@@ -72,8 +100,8 @@ export default function Home() {
           width: depth,
           quantity: 2,
           material: sharedMaterial,
-          grain: grain,
-          edges: commonEdges,
+          grain,
+          ...commonEdges,
           note: "Altura fija",
         },
         {
@@ -83,7 +111,7 @@ export default function Home() {
           quantity: 1,
           material: sharedMaterial,
           grain,
-          edges: { largo1: `${sharedMaterial} 0,45` },
+          ...edgeSet("0.45", "cantoIzq"),
           note: "Ancho − 36",
         },
         {
@@ -93,10 +121,7 @@ export default function Home() {
           quantity: 2,
           material: sharedMaterial,
           grain,
-          edges: {
-            largo1: `${sharedMaterial} 0,45`,
-            largo2: `${sharedMaterial} 0,45`,
-          },
+          ...edgeSet("0.45", "cantoIzq", "cantoDer"),
         },
         {
           reference: "ESTANTE",
@@ -105,7 +130,7 @@ export default function Home() {
           quantity: 1,
           material: sharedMaterial,
           grain,
-          edges: { largo1: `${sharedMaterial} 0,45` },
+          ...edgeSet("0.45", "cantoIzq"),
           note: "Ancho − 38 · Profundidad − 10",
         },
         {
@@ -115,7 +140,7 @@ export default function Home() {
           quantity: 1,
           material: "FIBRO",
           grain: "NO",
-          edges: {},
+          ...edgeSet("0.45"),
           note: "Ancho − 9 · Profundidad − 9",
         },
         {
@@ -125,12 +150,13 @@ export default function Home() {
           quantity: doors,
           material: sharedMaterial,
           grain,
-          edges: {
-            largo1: `${sharedMaterial} 2mm`,
-            largo2: `${sharedMaterial} 2mm`,
-            ancho1: `${sharedMaterial} 2mm`,
-            ancho2: `${sharedMaterial} 2mm`,
-          },
+          ...edgeSet(
+            "2",
+            "cantoSup",
+            "cantoInf",
+            "cantoIzq",
+            "cantoDer",
+          ),
           note: "780 − 33 · (Ancho ÷ puertas) − 5",
         },
       ];
@@ -144,7 +170,7 @@ export default function Home() {
         quantity: 2,
         material: sharedMaterial,
         grain,
-        edges: commonEdges,
+        ...commonEdges,
         note: "Altura fija",
       },
       {
@@ -154,7 +180,7 @@ export default function Home() {
         quantity: 1,
         material: sharedMaterial,
         grain,
-        edges: { largo1: `${sharedMaterial} 0,45` },
+        ...edgeSet("0.45", "cantoIzq"),
         note: "Ancho − 36",
       },
       {
@@ -164,10 +190,7 @@ export default function Home() {
         quantity: 1,
         material: sharedMaterial,
         grain,
-        edges: {
-          largo1: `${sharedMaterial} 0,45`,
-          largo2: `${sharedMaterial} 0,45`,
-        },
+        ...edgeSet("0.45", "cantoIzq", "cantoDer"),
       },
       {
         reference: "FALDÓN INFERIOR",
@@ -176,10 +199,7 @@ export default function Home() {
         quantity: 1,
         material: sharedMaterial,
         grain,
-        edges: {
-          largo1: `${sharedMaterial} 0,45`,
-          largo2: `${sharedMaterial} 0,45`,
-        },
+        ...edgeSet("0.45", "cantoIzq", "cantoDer"),
       },
       {
         reference: "FONDO",
@@ -188,7 +208,7 @@ export default function Home() {
         quantity: 1,
         material: "FIBRO",
         grain: "NO",
-        edges: {},
+        ...edgeSet("0.45"),
         note: "Ancho − 9 · Profundidad − 9",
       },
       {
@@ -198,7 +218,7 @@ export default function Home() {
         quantity: 3,
         material: sharedMaterial,
         grain,
-        edges: {},
+        ...edgeSet("0.45"),
         note: "Ancho − 111",
       },
       {
@@ -208,7 +228,7 @@ export default function Home() {
         quantity: 1,
         material: sharedMaterial,
         grain,
-        edges: { largo1: `${sharedMaterial} 0,45` },
+        ...edgeSet("0.45", "cantoIzq"),
         note: "Ancho − 123",
       },
       {
@@ -218,11 +238,7 @@ export default function Home() {
         quantity: 2,
         material: sharedMaterial,
         grain,
-        edges: {
-          largo1: `${sharedMaterial} 0,45`,
-          ancho1: `${sharedMaterial} 0,45`,
-          ancho2: `${sharedMaterial} 0,45`,
-        },
+        ...edgeSet("0.45", "cantoIzq", "cantoSup", "cantoInf"),
         note: "Ancho − 123",
       },
       {
@@ -232,12 +248,13 @@ export default function Home() {
         quantity: 1,
         material: sharedMaterial,
         grain,
-        edges: {
-          largo1: `${sharedMaterial} 2mm`,
-          largo2: `${sharedMaterial} 2mm`,
-          ancho1: `${sharedMaterial} 2mm`,
-          ancho2: `${sharedMaterial} 2mm`,
-        },
+        ...edgeSet(
+          "2",
+          "cantoSup",
+          "cantoInf",
+          "cantoIzq",
+          "cantoDer",
+        ),
         note: "169 · Ancho − 5",
       },
       {
@@ -247,12 +264,13 @@ export default function Home() {
         quantity: 2,
         material: sharedMaterial,
         grain,
-        edges: {
-          largo1: `${sharedMaterial} 2mm`,
-          largo2: `${sharedMaterial} 2mm`,
-          ancho1: `${sharedMaterial} 2mm`,
-          ancho2: `${sharedMaterial} 2mm`,
-        },
+        ...edgeSet(
+          "2",
+          "cantoSup",
+          "cantoInf",
+          "cantoIzq",
+          "cantoDer",
+        ),
         note: "268 · Ancho − 5",
       },
     ];
@@ -262,35 +280,56 @@ export default function Home() {
 
   function downloadCsv() {
     const headers = [
-      "Referencia",
-      "Largo (mm)",
-      "Ancho (mm)",
+      "Altura",
+      "Ancho",
       "Cantidad",
       "Material",
-      "Veta",
-      "Cantos",
-      "Observaciones",
+      "Espesor",
+      "Referencia",
+      "Dirección de la Fibra",
+      "Material de la Cinta superior",
+      "Grosor de Cinta superior",
+      "Material de la Cinta inferior",
+      "Espesor Cinta Inferior",
+      "Material de la Cinta izquierda",
+      "Grosor de la Cinta izquierda",
+      "Material de la Cinta derecha",
+      "Grosor de la Cinta derecha",
     ];
-    const rows = parts.map((part) => [
-      part.reference,
-      Math.max(0, Math.round(part.length)),
-      Math.max(0, Math.round(part.width)),
-      part.quantity,
-      part.material,
-      part.grain,
-      Object.entries(part.edges)
-        .map(([edge, value]) => `${edge}: ${value}`)
-        .join(" | "),
-      part.note ?? "",
-    ]);
-    const csv = [headers, ...rows]
+    const rows = parts.map((part) => {
+      const csvMaterial = part.material.trim().toUpperCase();
+      return [
+        Math.max(0, Math.round(part.length)),
+        Math.max(0, Math.round(part.width)),
+        part.quantity,
+        csvMaterial,
+        "",
+        part.reference.toUpperCase(),
+        part.grain === "SI" ? "1" : "",
+        part.cantoSup ? csvMaterial : "",
+        part.cantoSup,
+        part.cantoInf ? csvMaterial : "",
+        part.cantoInf,
+        part.cantoIzq ? csvMaterial : "",
+        part.cantoIzq,
+        part.cantoDer ? csvMaterial : "",
+        part.cantoDer,
+      ];
+    });
+    const csv = `${[headers, ...rows]
       .map((row) => row.map(escapeCsvValue).join(";"))
-      .join("\r\n");
-    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+      .join("\r\n")}\r\n`.replace(/^\uFEFF/, "");
+    const bytes = new Uint8Array(csv.length);
+    for (let index = 0; index < csv.length; index += 1) {
+      bytes[index] = csv.charCodeAt(index) & 0xff;
+    }
+    const blob = new Blob([bytes], {
+      type: "text/csv;charset=windows-1252;",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `despiece-${furniture}.csv`;
+    link.download = `opticut-${furniture}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -383,20 +422,22 @@ export default function Home() {
               </select>
               <small>VARIABLE 2</small>
             </label>
-            <label className="field">
-              <span>Puertas</span>
-              <input
-                min="1"
-                onChange={(event) => setDoors(Math.max(1, Number(event.target.value)))}
-                type="number"
-                value={doors}
-              />
-              <small>VARIABLE 3</small>
-            </label>
+            {furniture === "bajo-mesada" && (
+              <label className="field">
+                <span>Puertas</span>
+                <input
+                  min="1"
+                  onChange={(event) => setDoors(Math.max(1, Number(event.target.value)))}
+                  type="number"
+                  value={doors}
+                />
+                <small>VARIABLE 3</small>
+              </label>
+            )}
             <label className="field">
               <span>Ancho total <em>mm</em></span>
               <input
-                min="100"
+                min="250"
                 onChange={(event) => setWidth(Number(event.target.value))}
                 type="number"
                 value={width}
@@ -406,7 +447,7 @@ export default function Home() {
             <label className="field">
               <span>Profundidad <em>mm</em></span>
               <input
-                min="100"
+                min="200"
                 onChange={(event) => setDepth(Number(event.target.value))}
                 type="number"
                 value={depth}
@@ -414,6 +455,12 @@ export default function Home() {
               <small>VARIABLE 6</small>
             </label>
           </div>
+          {!dimensionsAreValid && (
+            <p className="validation-alert" role="alert">
+              Para generar el despiece, el ancho debe ser de al menos 250 mm y
+              la profundidad debe ser de al menos 200 mm.
+            </p>
+          )}
           <div className="formula-hint">
             <span className="formula-icon">ƒx</span>
             <span>Las medidas se calculan según las fórmulas de la plantilla original.</span>
@@ -438,7 +485,12 @@ export default function Home() {
           </div>
 
           <div className="export-actions" aria-label="Exportar despiece">
-            <button className="export-button secondary" onClick={downloadCsv} type="button">
+            <button
+              className="export-button secondary"
+              disabled={!dimensionsAreValid}
+              onClick={downloadCsv}
+              type="button"
+            >
               Descargar CSV
             </button>
             <button className="export-button primary" onClick={printPdf} type="button">
@@ -473,14 +525,20 @@ export default function Home() {
                     <td><span className={`grain ${part.grain === "SI" ? "yes" : ""}`}>{part.grain}</span></td>
                     <td>
                       <div className="edges">
-                        {edgeLabels.map(({ key, label }) =>
-                          part.edges[key] ? (
-                            <span key={key} title={`${label}: ${part.edges[key]}`}>
-                              {label.replace("Largo ", "L").replace("Ancho ", "A")}
+                        {edgeLabels.map(({ key, label, shortLabel }) =>
+                          part[key] ? (
+                            <span
+                              aria-label={`${label}: ${part.material} ${part[key].replace(".", ",")} mm`}
+                              key={key}
+                              title={`${label}: ${part.material} ${part[key].replace(".", ",")} mm`}
+                            >
+                              {`${shortLabel} ${part[key].replace(".", ",")}`}
                             </span>
                           ) : null,
                         )}
-                        {Object.keys(part.edges).length === 0 && <span className="none">—</span>}
+                        {edgeLabels.every(({ key }) => !part[key]) && (
+                          <span className="none">—</span>
+                        )}
                       </div>
                     </td>
                   </tr>
