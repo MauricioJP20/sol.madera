@@ -65,11 +65,6 @@ function formatMillimeters(value: number) {
   return `${Math.max(0, Math.round(value))} mm`;
 }
 
-function escapeCsvValue(value: string | number) {
-  const text = String(value);
-  return `"${text.replaceAll('"', '""')}"`;
-}
-
 export default function Home() {
   const [furniture, setFurniture] = useState<FurnitureType>("bajo-mesada");
   const [material, setMaterial] = useState("BLANCO");
@@ -85,12 +80,7 @@ export default function Home() {
 
   const parts = useMemo<Part[]>(() => {
     const sharedMaterial = material.trim() || "BLANCO";
-    const commonEdges = edgeSet(
-      "0.45",
-      "cantoIzq",
-      "cantoSup",
-      "cantoInf",
-    );
+    const commonEdges = edgeSet("0.45", "cantoIzq", "cantoDer");
 
     if (furniture === "bajo-mesada") {
       return [
@@ -317,7 +307,7 @@ export default function Home() {
       ];
     });
     const csv = `${[headers, ...rows]
-      .map((row) => row.map(escapeCsvValue).join(";"))
+      .map((row) => row.join(";"))
       .join("\r\n")}\r\n`.replace(/^\uFEFF/, "");
     const bytes = new Uint8Array(csv.length);
     for (let index = 0; index < csv.length; index += 1) {
